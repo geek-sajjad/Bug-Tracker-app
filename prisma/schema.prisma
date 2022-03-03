@@ -10,29 +10,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
+// model User {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   email     String   @unique
+//   name      String?
+//   role      Role     @default(USER)
+//   posts     Post[]
+// }
+
+model User{
+  id Int @id @default(autoincrement())
+  email String @unique @db.VarChar(255)
+  name String? @db.VarChar(255)
+  hashedPassword String @db.VarChar(255)
+  isAdmin Boolean @default(false)
   createdAt DateTime @default(now())
-  email     String   @unique
-  name      String?
-  role      Role     @default(USER)
-  posts     Post[]
+  updatedAt DateTime? @updatedAt
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean  @default(false)
-  title     String   @db.VarChar(255)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
-}
+// model Post {
+//   id        Int      @id @default(autoincrement())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   published Boolean  @default(false)
+//   title     String   @db.VarChar(255)
+//   author    User?    @relation(fields: [authorId], references: [id])
+//   authorId  Int?
+// }
 
-enum Role {
-  USER
-  ADMIN
-}
+// enum Role {
+//   USER
+//   ADMIN
+// }
 
 model Session {
   id        String   @id

@@ -1,35 +1,62 @@
-exports.getLogin = (req, res, next) => {
-    if(req.session.isLoggedIn){
-        return res.redirect('/');
-    }
-    res.render('auth/login', {
-        docTitle: 'Login'
-    });
-}
+const passport = require('passport');
 
-exports.postLogin = (req, res, next) => {
-    console.log(req.body);
-    req.session.isLoggedIn = true;
-    
-    res.redirect('/dashboard');
-}
+exports.getLogin = (req, res, next) => {
+  if (req.user) {
+    return res.redirect('/');
+  }
+  res.render('auth/login', {
+    docTitle: 'Login',
+    message: req.flash('loginMessage'),
+  });
+};
+
+// exports.postLogin = (req, res, next) => {
+//     res.redirect('/dashboard');
+// }
 
 exports.getSingup = (req, res, next) => {
-    if(req.session.isLoggedIn){
-        return res.redirect('/');
-    }
-    res.render('auth/signup', {
-        docTitle: 'signup'
-    });
-}
+  if (req.user) {
+    return res.redirect('/');
+  }
+  res.render('auth/signup', {
+    docTitle: 'signup',
+    message: req.flash('signupMessage'),
+    oldInput: {
+      email: '',
+      password: '',
+      name: '',
+    },
+  });
+};
 
 exports.postSignup = (req, res, next) => {
-    req.session.isLoggedIn = true;
-    res.redirect('/dashboard');
-}
+  passport.authenticate('local-signup', (err, user, info) => {
+    if (err) return next(err);
+    const { email, name, password } = req.body;
+
+    if (!user) {
+      return res.render('auth/signup', {
+        docTitle: 'signup',
+        message: req.flash('signupMessage'),
+        oldInput: {
+          name: name,
+          email: email,
+          password: password,
+        },
+      });
+    }
+
+    req.logIn(user, err => {
+      if (err) return next(err);
+      return res.redirect('/dashboard');
+    });
+  })(req, res, next);
+};
 
 exports.postLogout = (req, res, next) => {
-    req.session.destroy(err => {
-        res.redirect('/');
-    });
-}
+  req.logout();
+  return res.redirect('/');
+  // req.session.destroy(err => {
+  //     res.redirect('/');
+  // });
+};
