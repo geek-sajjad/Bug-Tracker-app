@@ -5,8 +5,9 @@ exports.get404 = (req, res, next) => {
 }
 
 exports.get500 = (err, req, res, next) => {
-    console.log(err.message);
-    console.log(err.status);
+    console.log(err);
+    // console.log(err.message);
+    // console.log(err.status);
     res.status(500).render('500', {
         docTitle: '500 server error',
     });

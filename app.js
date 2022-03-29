@@ -12,7 +12,7 @@ const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const websiteRoutes = require('./routes/website');
 const dashboardRoutes = require('./routes/dashboard');
 const authRoutes = require('./routes/auth');
-const apiRoutes = require('./routes/api/index');
+const apiRoutes = require('./routes/api/v1/index');
 const error = require('./controllers/error');
 const authMiddleware = require('./middlewares/auth');
 const flash = require('express-flash');
@@ -32,7 +32,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.use(morgan('dev'))
 app.use(helmet());
-
+app.use(express.json());
+app.use('/api/v1', apiRoutes);
 app.use(
   expressSession({
     resave: false,
@@ -42,10 +43,8 @@ app.use(
   })
 );
 
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 app.use(csrfProtection);
 app.use(hpp());
 
@@ -59,13 +58,11 @@ app.use(passport.session())
 app.use(passport.initialize())
 app.use(flash());
 
-app.use('/api', apiRoutes);
 app.use(authRoutes);
 app.use(websiteRoutes);
 app.use('/dashboard', authMiddleware, dashboardRoutes);
 app.use(error.get404);
 app.use(error.get500);
-
 
 app.listen(3000, () =>
   console.log('🚀 Server ready at: http://localhost:3000')
