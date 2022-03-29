@@ -20,36 +20,48 @@ datasource db {
 // }
 
 model User {
-  id              Int               @id @default(autoincrement())
-  email           String            @unique @db.VarChar(255)
-  name            String?           @db.VarChar(255)
-  hashedPassword  String            @db.VarChar(255)
-  isAdmin         Boolean           @default(false)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime?         @updatedAt
-  ownedProjects   Project[]
+  id               Int               @id @default(autoincrement())
+  email            String            @unique @db.VarChar(255)
+  name             String?           @db.VarChar(255)
+  hashedPassword   String            @db.VarChar(255)
+  isAdmin          Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime?         @updatedAt
+  ownedProjects    Project[]
   assignedProjects UsersOnProjects[]
 }
 
 model Project {
-  id           Int               @id @default(autoincrement())
-  name         String            @db.VarChar(255)
-  owner        User              @relation(fields: [ownerId], references: [id])
-  ownerId      Int
+  id            Int               @id @default(autoincrement())
+  name          String            @db.VarChar(255)
+  owner         User              @relation(fields: [ownerId], references: [id])
+  ownerId       Int
   assignedUsers UsersOnProjects[]
-  status       ProjectStatus     @default(OPEN)
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime?         @updatedAt
+  status        ProjectStatus     @default(OPEN)
+  issues        Issue[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime?         @updatedAt
 }
 
 model UsersOnProjects {
-  project   Project @relation(fields: [projectId], references: [id])
-  projectId Int
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
+  project    Project  @relation(fields: [projectId], references: [id])
+  projectId  Int
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
   assignedAt DateTime @default(now())
 
   @@id([projectId, userId])
+}
+
+model Issue {
+  id          Int         @id @default(autoincrement())
+  name        String      @db.VarChar(255)
+  description String?     @db.Text
+  status      IssueStatus @default(OPEN)
+  projectId   Int
+  project     Project     @relation(fields: [projectId], references: [id])
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime?   @updatedAt
 }
 
 // model Post {
@@ -66,6 +78,12 @@ model UsersOnProjects {
 //   USER
 //   ADMIN
 // }
+
+enum IssueStatus {
+  OPEN
+  IN_PROGRESS
+  CLOASE
+}
 
 enum ProjectStatus {
   OPEN
