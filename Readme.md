@@ -1,1 +1,2 @@
-# Bug Tracker Application using Express Prisma and JWT and Passport and MongoDB Session Driver
+# Bug Tracker Application
+## Stack: Express Prisma and JWT and Passport and MongoDB Session Driver
